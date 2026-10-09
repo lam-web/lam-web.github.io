@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thí nghiệm con lắc đơn - Vật lý THCS</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(135deg, #e0f7fa, #f1f8e9);
+      min-height: 100vh;
+      color: #2c3e50;
+      padding: 20px;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    header h1 { color: #00695c; font-size: 28px; }
+    header p { color: #555; margin-top: 6px; }
+    .home-link {
+      display: inline-block;
+      margin-top: 10px;
+      color: #0277bd;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .home-link:hover { text-decoration: underline; }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 20px;
+    }
+    @media (max-width: 850px) {
+      .container { grid-template-columns: 1fr; }
+    }
+    .panel {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+      padding: 20px;
+    }
+    canvas {
+      width: 100%;
+      background: #fafcff;
+      border-radius: 10px;
+      border: 1px solid #dceefb;
+      touch-action: none;
+      cursor: grab;
+      display: block;
+    }
+    .hint {
+      font-size: 13px;
+      color: #777;
+      text-align: center;
+      margin-top: 8px;
+    }
+    .controls h2 {
+      font-size: 18px;
+      color: #00695c;
+      margin-bottom: 14px;
+      border-bottom: 2px solid #b2dfdb;
+      padding-bottom: 6px;
+    }
+    .control-group { margin-bottom: 16px; }
+    .control-group label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .control-group label span { color: #0277bd; }
+    input[type="range"] { width: 100%; accent-color: #00897b; }
+    .buttons { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    button {
+      flex: 1;
+      background: #00897b;
+      color: #fff;
+      border: none;
+      padding: 10px 12px;
+      font-size: 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+      min-width: 90px;
+    }
+    button:hover { background: #00695c; }
+    button.secondary { background: #78909c; }
+    button.secondary:hover { background: #546e7a; }
+    .readout {
+      background: #e0f2f1;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 14px;
+      line-height: 1.9;
+    }
+    .readout b { color: #00695c; }
+    .theory {
+      grid-column: 1 / -1;
+    }
+    .theory h2 { font-size: 18px; color: #00695c; margin-bottom: 10px; }
+    .theory ul { margin-left: 20px; line-height: 1.8; font-size: 14px; }
+    .formula {
+      background: #fff8e1;
+      border: 1px dashed #ffb300;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin: 10px 0;
+      font-size: 16px;
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+    th, td {
+      border: 1px solid #b2dfdb;
+      padding: 6px 8px;
+      text-align: center;
+    }
+    th { background: #e0f2f1; color: #00695c; }
+    footer { text-align: center; margin-top: 24px; font-size: 13px; color: #888; }
+    footer a { color: #0277bd; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🔬 Thí nghiệm con lắc đơn</h1>
+    <p>Môn Vật lý cấp THCS — Kéo quả nặng để thả, hoặc dùng các nút điều khiển bên dưới</p>
+    <a class="home-link" href="index.html">⬅ Về trang chủ</a>
+  </header>
+
+  <div class="container">
+    <div class="panel">
+      <canvas id="canvas" width="700" height="480"></canvas>
+      <p class="hint">💡 Mẹo: dùng chuột (hoặc ngón tay) kéo quả nặng đến góc muốn rồi thả ra để quan sát dao động.</p>
+    </div>
+
+    <div class="panel controls">
+      <h2>⚙️ Điều khiển thí nghiệm</h2>
+
+      <div class="control-group">
+        <label>Chiều dài dây (cm) <span id="lenVal">50</span></label>
+        <input type="range" id="lenSlider" min="10" max="120" value="50" step="1" />
+      </div>
+
+      <div class="control-group">
+        <label>Khối lượng quả nặng (g) <span id="massVal">200</span></label>
+        <input type="range" id="massSlider" min="50" max="1000" value="200" step="10" />
+      </div>
+
+      <div class="control-group">
+        <label>Góc ban đầu (°) <span id="angVal">25</span></label>
+        <input type="range" id="angSlider" min="2" max="60" value="25" step="1" />
+      </div>
+
+      <div class="buttons">
+        <button id="startBtn">▶ Thả lắc</button>
+        <button id="pauseBtn" class="secondary">⏸ Tạm dừng</button>
+        <button id="resetBtn" class="secondary">↺ Đặt lại</button>
+      </div>
+
+      <div class="readout">
+        <div>📏 Chiều dài: <b id="roLen">0.50 m</b></div>
+        <div>📐 Góc hiện tại: <b id="roAngle">0°</b></div>
+        <div>⏱ Chu kỳ đo được: <b id="roPeriod">— s</b></div>
+        <div>🧮 Chu kỳ lý thuyết: <b id="roTheory">— s</b></div>
+        <div>🔢 Số dao động: <b id="roCount">0</b></div>
+      </div>
+
+      <div class="buttons" style="margin-top:14px;">
+        <button id="recordBtn" class="secondary">📋 Ghi kết quả vào bảng</button>
+      </div>
+
+      <table>
+        <thead>
+          <tr><th>Lần</th><th>ℓ (m)</th><th>T đo (s)</th><th>T² (s²)</th></tr>
+        </thead>
+        <tbody id="resultTable"></tbody>
+      </table>
+    </div>
+
+    <div class="panel theory">
+      <h2>📖 Kiến thức cần nhớ</h2>
+      <div class="formula">T = 2π√(ℓ/g) &nbsp;&nbsp; với g ≈ 9,8 m/s²</div>
+      <ul>
+        <li><b>Con lắc đơn</b> gồm một vật nặng treo ở đầu một dây mảnh, nhẹ, có thể dao động quanh vị trí cân bằng.</li>
+        <li>Khi góc dao động nhỏ (≤ 10°), con lắc dao động điều hòa với chu kỳ <b>chỉ phụ thuộc vào chiều dài dây ℓ và gia tốc trọng trường g</b>.</li>
+        <li>Chu kỳ <b>không phụ thuộc vào khối lượng</b> quả nặng — hãy thử thay đổi khối lượng và kiểm chứng! 🤔</li>
+        <li>Dây càng dài → chu kỳ càng lớn (con lắc dao động chậm hơn).</li>
+        <li>Ứng dụng: đồng hồ quả lắc, đo gia tốc trọng trường.</li>
+      </ul>
+    </div>
+  </div>
+
+  <footer>
+    © 2026 lam-web · <a href="index.html">Trang chủ</a> · <a href="conlacdon.html">Con lắc đơn</a>
+  </footer>
+
+  <script>
+    // ===== Trạng thái mô phỏng =====
+    const g = 9.8;
+    let L = 0.5;            // mét
+    let mass = 200;         // gam (chỉ ảnh hưởng kích thước vẽ)
+    let theta = 25 * Math.PI / 180; // rad
+    let omega = 0;          // vận tốc góc
+    let running = false;
+    let dragging = false;
+    let lastCrossTime = null;
+    let periodMeasured = null;
+    let count = 0;
+    let simTime = 0;
+
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const pivot = { x: canvas.width / 2, y: 60 };
+    const pxPerMeter = 300; // tỉ lệ vẽ
+
+    function bobPos() {
+      const r = L * pxPerMeter;
+      return {
+        x: pivot.x + r * Math.sin(theta),
+        y: pivot.y + r * Math.cos(theta)
+      };
+    }
+
+    function bobRadius() {
+      return 10 + Math.sqrt(mass) / 3; // quả to hơn khi nặng hơn
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // giá đỡ
+      ctx.fillStyle = '#90a4ae';
+      ctx.fillRect(pivot.x - 60, pivot.y - 14, 120, 14);
+      ctx.beginPath();
+      ctx.arc(pivot.x, pivot.y, 5, 0, Math.PI * 2);
+      ctx.fillStyle = '#37474f';
+      ctx.fill();
+
+      // phương thẳng đứng (vị trí cân bằng)
+      ctx.strokeStyle = '#cfd8dc';
+      ctx.setLineDash([5, 5]);
+      ctx.beginPath();
+      ctx.moveTo(pivot.x, pivot.y);
+      ctx.lineTo(pivot.x, pivot.y + L * pxPerMeter + 40);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // cung góc
+      const b = bobPos();
+      ctx.strokeStyle = '#ffca28';
+      ctx.beginPath();
+      ctx.arc(pivot.x, pivot.y, 45, Math.PI / 2 - Math.max(theta, 0), Math.PI / 2 - Math.min(theta, 0));
+      ctx.stroke();
+
+      // dây
+      ctx.strokeStyle = '#5d4037';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(pivot.x, pivot.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+      ctx.lineWidth = 1;
+
+      // quả nặng
+      const grad = ctx.createRadialGradient(b.x - 5, b.y - 5, 3, b.x, b.y, bobRadius());
+      grad.addColorStop(0, '#4fc3f7');
+      grad.addColorStop(1, '#01579b');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, bobRadius(), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#0d47a1';
+      ctx.stroke();
+
+      // nhãn góc
+      ctx.fillStyle = '#37474f';
+      ctx.font = '14px Segoe UI';
+      ctx.fillText('θ = ' + (theta * 180 / Math.PI).toFixed(1) + '°', pivot.x + 55, pivot.y + 30);
+    }
+
+    // ===== Vật lý: mô phỏng chính xác (không chỉ công thức góc nhỏ) =====
+    // alpha = -(g/L) sin(theta) - damping*omega
+    let prevTheta = theta;
+    function physicsStep(dt) {
+      const damping = 0.002; // ma sát rất nhỏ để giống thực tế
+      const alpha = -(g / L) * Math.sin(theta) - damping * omega;
+      omega += alpha * dt;
+      prevTheta = theta;
+      theta += omega * dt;
+      simTime += dt;
+
+      // đếm dao động: cắt ngang vị trí cân bằng theo một chiều
+      if (running && prevTheta <= 0 && theta > 0) {
+        const now = performance.now() / 1000;
+        if (lastCrossTime !== null) {
+          periodMeasured = now - lastCrossTime;
+        }
+        lastCrossTime = now;
+        count++;
+      }
+    }
+
+    let lastFrame = null;
+    function loop(ts) {
+      if (lastFrame === null) lastFrame = ts;
+      let dt = (ts - lastFrame) / 1000;
+      lastFrame = ts;
+      if (dt > 0.05) dt = 0.05; // tránh nhảy bước khi tab ẩn
+
+      if (running && !dragging) {
+        // chia nhỏ bước để ổn định
+        const steps = 4;
+        for (let i = 0; i < steps; i++) physicsStep(dt / steps);
+      }
+      draw();
+      updateReadout();
+      requestAnimationFrame(loop);
+    }
+
+    function updateReadout() {
+      document.getElementById('roLen').textContent = L.toFixed(2) + ' m';
+      document.getElementById('roAngle').textContent = (theta * 180 / Math.PI).toFixed(1) + '°';
+      document.getElementById('roCount').textContent = count;
+      const T = 2 * Math.PI * Math.sqrt(L / g);
+      document.getElementById('roTheory').textContent = T.toFixed(3) + ' s';
+      document.getElementById('roPeriod').textContent =
+        periodMeasured ? periodMeasured.toFixed(3) + ' s' : '— s';
+    }
+
+    // ===== Tương tác chuột/chạm =====
+    function getPoint(e) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const src = e.touches ? e.touches[0] : e;
+      return {
+        x: (src.clientX - rect.left) * scaleX,
+        y: (src.clientY - rect.top) * scaleY
+      };
+    }
+
+    function onDown(e) {
+      const p = getPoint(e);
+      const b = bobPos();
+      const d = Math.hypot(p.x - b.x, p.y - b.y);
+      if (d < bobRadius() + 20) {
+        dragging = true;
+        running = false;
+        canvas.style.cursor = 'grabbing';
+        e.preventDefault();
+      }
+    }
+    function onMove(e) {
+      if (!dragging) return;
+      const p = getPoint(e);
+      theta = Math.atan2(p.x - pivot.x, p.y - pivot.y);
+      theta = Math.max(-75 * Math.PI / 180, Math.min(75 * Math.PI / 180, theta));
+      omega = 0;
+      document.getElementById('angSlider').value = Math.round(Math.abs(theta) * 180 / Math.PI);
+      document.getElementById('angVal').textContent = Math.round(Math.abs(theta) * 180 / Math.PI);
+      e.preventDefault();
+    }
+    function onUp() {
+      if (dragging) {
+        dragging = false;
+        running = true;
+        lastCrossTime = null;
+        canvas.style.cursor = 'grab';
+      }
+    }
+
+    canvas.addEventListener('mousedown', onDown);
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    canvas.addEventListener('touchstart', onDown, { passive: false });
+    window.addEventListener('touchmove', onMove, { passive: false });
+    window.addEventListener('touchend', onUp);
+
+    // ===== Điều khiển =====
+    const lenSlider = document.getElementById('lenSlider');
+    const massSlider = document.getElementById('massSlider');
+    const angSlider = document.getElementById('angSlider');
+
+    lenSlider.addEventListener('input', () => {
+      L = lenSlider.value / 100;
+      document.getElementById('lenVal').textContent = lenSlider.value;
+      periodMeasured = null;
+      lastCrossTime = null;
+    });
+    massSlider.addEventListener('input', () => {
+      mass = +massSlider.value;
+      document.getElementById('massVal').textContent = massSlider.value;
+    });
+    angSlider.addEventListener('input', () => {
+      document.getElementById('angVal').textContent = angSlider.value;
+      theta = angSlider.value * Math.PI / 180;
+      omega = 0;
+      periodMeasured = null;
+      lastCrossTime = null;
+    });
+
+    document.getElementById('startBtn').addEventListener('click', () => {
+      running = true;
+      lastCrossTime = null;
+    });
+    document.getElementById('pauseBtn').addEventListener('click', () => {
+      running = false;
+    });
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      running = false;
+      theta = angSlider.value * Math.PI / 180;
+      omega = 0;
+      count = 0;
+      periodMeasured = null;
+      lastCrossTime = null;
+    });
+
+    // ===== Bảng kết quả thí nghiệm =====
+    let recordCount = 0;
+    document.getElementById('recordBtn').addEventListener('click', () => {
+      if (!periodMeasured) {
+        alert('Hãy thả lắc và chờ đo được ít nhất 1 chu kỳ trước khi ghi kết quả!');
+        return;
+      }
+      recordCount++;
+      const tr = document.createElement('tr');
+      const T = periodMeasured;
+      tr.innerHTML = '<td>' + recordCount + '</td><td>' + L.toFixed(2) +
+        '</td><td>' + T.toFixed(3) + '</td><td>' + (T * T).toFixed(3) + '</td>';
+      document.getElementById('resultTable').appendChild(tr);
+    });
+
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>
