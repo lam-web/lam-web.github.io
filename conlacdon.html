@@ -14,17 +14,28 @@
       padding: 20px;
     }
     header {
-      text-align: center;
-      margin-bottom: 20px;
+      max-width: 1100px;
+      margin: 0 auto 20px auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
     }
+    header .title-block { flex: 1; min-width: 240px; }
     header h1 { color: #00695c; font-size: 28px; }
     header p { color: #555; margin-top: 6px; }
     .home-link {
+      align-self: center;
+      white-space: nowrap;
       display: inline-block;
-      margin-top: 10px;
       color: #0277bd;
       text-decoration: none;
       font-weight: bold;
+      background: #fff;
+      padding: 8px 14px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
     .home-link:hover { text-decoration: underline; }
     .container {
@@ -131,8 +142,10 @@
 </head>
 <body>
   <header>
-    <h1>🔬 Thí nghiệm con lắc đơn</h1>
-    <p>Môn Vật lý cấp THCS — Kéo quả nặng để thả, hoặc dùng các nút điều khiển bên dưới</p>
+    <div class="title-block">
+      <h1>🔬 Thí nghiệm con lắc đơn</h1>
+      <p>Môn Vật lý cấp THCS — Kéo quả nặng để thả, hoặc dùng các nút điều khiển bên dưới</p>
+    </div>
     <a class="home-link" href="index.html">⬅ Về trang chủ</a>
   </header>
 
