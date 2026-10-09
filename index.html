@@ -1,1 +1,64 @@
-Ok
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trang đơn giản</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #333;
+    }
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      max-width: 480px;
+      width: 90%;
+      padding: 40px;
+      text-align: center;
+    }
+    h1 { color: #4a3f8c; margin-bottom: 12px; }
+    p { line-height: 1.6; margin-bottom: 24px; color: #555; }
+    button {
+      background: #667eea;
+      color: #fff;
+      border: none;
+      padding: 12px 28px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover { background: #5a6fd8; }
+    footer { margin-top: 24px; font-size: 13px; color: #999; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Xin chào! 👋</h1>
+    <p>Đây là một trang web đơn giản. Hãy nhấn nút bên dưới để xem điều bất ngờ.</p>
+    <button onclick="sayHello()">Bấm vào đây</button>
+    <p id="message"></p>
+    <footer>&copy; 2026 lam-web</footer>
+  </div>
+  <script>
+    function sayHello() {
+      const messages = [
+        "Chúc bạn một ngày tốt lành! ☀️",
+        "Bạn thật tuyệt vời! 🌟",
+        "Hãy cứ vui vẻ nhé! 😄",
+        "Mọi chuyện rồi sẽ ổn thôi! 💜"
+      ];
+      const random = messages[Math.floor(Math.random() * messages.length)];
+      document.getElementById("message").textContent = random;
+    }
+  </script>
+</body>
+</html>
